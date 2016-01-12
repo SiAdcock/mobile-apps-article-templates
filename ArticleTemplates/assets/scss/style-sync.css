@@ -2378,6 +2378,7 @@ Display a selection of images that form a gallery.
       .gallery .gallery__image-container .gallery__link .gallery__image {
         height: 100%;
         width: 100%;
+        background-color: #999;
         background-size: cover;
         background-position: 50% 50%;
         background-repeat: no-repeat; }
