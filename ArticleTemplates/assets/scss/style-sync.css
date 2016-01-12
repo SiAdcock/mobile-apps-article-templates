@@ -2356,16 +2356,31 @@ Display a selection of images that form a gallery.
 ```
 */
 .gallery {
-  padding: 12px 12px 0px 12px; }
-  @media all and (max-width: 28.12em) {
-    .gallery {
-      padding: 4px; } }
-
-.gallery__link {
-  background-color: #4d4d4d; }
-
-.gallery__image {
-  vertical-align: bottom; }
+  display: flex;
+  flex-flow: row wrap;
+  padding: 4px; }
+  .gallery .gallery__image-container {
+    display: inline-block;
+    padding: 4px;
+    flex: 1 100%;
+    box-sizing: border-box; }
+    .gallery .gallery__image-container--flex2 {
+      flex: 0.5;
+      min-width: 50%; }
+    .gallery .gallery__image-container--flex3 {
+      flex: 0.33;
+      min-width: 33%; }
+    .gallery .gallery__image-container--flex4 {
+      flex: 0.25;
+      min-width: 25%; }
+    .gallery .gallery__image-container .gallery__link {
+      background-color: #4d4d4d; }
+      .gallery .gallery__image-container .gallery__link .gallery__image {
+        height: 100%;
+        width: 100%;
+        background-size: cover;
+        background-position: 50% 50%;
+        background-repeat: no-repeat; }
 
 /*doc
 ---
