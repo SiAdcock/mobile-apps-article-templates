@@ -1,120 +1,126 @@
 define([
-    'bean'
+	'bean'
 ], function(
-    bean
+	bean
 ) {
-    'use strict';
+	'use strict';
 
-    var galleryRows,
-        galleryProps = {
-            minImagesPerRow: 2,
-            maxImagesPerRow: 3
-        };
+	var PROPS = {
+			650: {
+				minImagesPerRow: 2,
+				maxImagesPerRow: 3
+			},
+			900: {
+				minImagesPerRow: 3,
+				maxImagesPerRow: 4
+			},
+			1200: {
+				minImagesPerRow: 4,
+				maxImagesPerRow: 5
+			}
+		};
 
-    function init() {
-        addImagesToRows();
-        addFlexClass();
-        adjustHeights();
-        showImages();
+	var galleryProps,
+		galleryRows;
 
-        bean.on(window, 'resize', window.ThrottleDebounce.debounce(100, false, resizeHandler));
-        bean.on(window, 'scroll', window.ThrottleDebounce.debounce(100, false, scrollHandler));
-    }
+	function init() {
+		setGalleryProps();
+		addImagesToRows();
+		addFlexClass();
+		showImages();
 
-    function resizeHandler() {
-        adjustHeights();
-        showImages();
-    }
+		bean.on(window, 'resize scroll', window.ThrottleDebounce.debounce(100, false, showImages));
+	}
 
-    function scrollHandler() {
-        showImages();
-    }
+	function setGalleryProps() {
+		var width;
 
-    function showImages() {
-        var i, j;
+		for (width in PROPS) {
+			if(PROPS.hasOwnProperty(width)) {
+				if (window.innerWidth < parseInt(width, 10)) {
+					galleryProps = PROPS[width];
+					break;
+				}
+			}
+		}
 
-        for (i = 0; i < galleryRows.length; i++) {
-            for (j = 0; j < galleryRows[i].length; j++) {
-                if (!galleryRows[i][j].classList.contains("loaded") && isImageInView(galleryRows[i][j])) {
-                    loadImage(galleryRows[i][j]);
-                }
-            }
-        }
-    }
+		if (!galleryProps) {
+			galleryProps = PROPS[width];
+		}
+	}
 
-    function isImageInView(imageContainer) {
-        var rect = imageContainer.getBoundingClientRect();
+	function showImages() {
+		var i, j;
 
-        return rect.top <= window.innerHeight;
-    }
+		for (i = 0; i < galleryRows.length; i++) {
+			for (j = 0; j < galleryRows[i].length; j++) {
+				if (!galleryRows[i][j].classList.contains("loaded") && isImageInView(galleryRows[i][j])) {
+					loadImage(galleryRows[i][j]);
+				}
+			}
+		}
+	}
 
-    function loadImage(imageContainer) {
-        var img = document.createElement("img");
+	function isImageInView(imageContainer) {
+		var rect = imageContainer.getBoundingClientRect();
 
-        img.src = imageContainer.dataset.url;
+		return rect.top <= window.innerHeight;
+	}
 
-        if (!img.complete) {
-            img.onload = onImageLoaded.bind(null, imageContainer);
-        } else {
-            onImageLoaded(imageContainer);
-        }
-    }
+	function loadImage(imageContainer) {
+		var img = document.createElement("img");
 
-    function onImageLoaded(imageContainer) {
-        var image = imageContainer.getElementsByClassName("gallery__image")[0];
+		img.src = imageContainer.dataset.url;
 
-        image.style.backgroundImage = "url('" + imageContainer.dataset.url + "')";
+		if (!img.complete) {
+			img.onload = onImageLoaded.bind(null, imageContainer);
+		} else {
+			onImageLoaded(imageContainer);
+		}
+	}
 
-        imageContainer.classList.add("loaded");
-    }
+	function onImageLoaded(imageContainer) {
+		var image = imageContainer.getElementsByClassName("gallery__image")[0];
 
-    function addImagesToRows() {
-        var i,
-            images = document.body.getElementsByClassName('gallery__image-container'),
-            rows = [
-                []
-            ],
-            currentRow = 0;
+		image.style.backgroundImage = "url('" + imageContainer.dataset.url + "')";
 
-        for (i = images.length - 1; i >= 0; i--) {
-            if (rows[0].length === galleryProps.maxImagesPerRow) {
-                rows.unshift([]);
-            }
+		imageContainer.classList.add("loaded");
+	}
 
-            rows[0].unshift(images[i]);
+	function addImagesToRows() {
+		var i,
+			images = document.body.getElementsByClassName('gallery__image-container'),
+			rows = [
+				[]
+			],
+			currentRow = 0;
 
-            if (i === 0 && rows[0].length < galleryProps.minImagesPerRow && rows.length > 1) {
-                rows[0].push(rows[1].shift());
-            }
-        }
+		for (i = images.length - 1; i >= 0; i--) {
+			if (rows[0].length === galleryProps.maxImagesPerRow) {
+				rows.unshift([]);
+			}
 
-        galleryRows = rows;
-    }
+			rows[0].unshift(images[i]);
 
-    function addFlexClass() {
-        var i, j;
+			if (i === 0 && rows[0].length < galleryProps.minImagesPerRow && rows.length > 1) {
+				rows[0].push(rows[1].shift());
+			}
+		}
 
-        for (i = 0; i < galleryRows.length; i++) {
-            for (j = 0; j < galleryRows[i].length; j++) {
-                galleryRows[i][j].classList.add("gallery__image-container--flex" + galleryRows[i].length);
-            }
-        }
-    }
+		galleryRows = rows;
+	}
 
-    function adjustHeights() {
-        var i, j, rowHeights = [];
+	function addFlexClass() {
+		var i, j;
 
-        for (i = 0; i < galleryRows.length; i++) {
-            for (j = 0; j < galleryRows[i].length; j++) {
-                if (!rowHeights[i]) {
-                    rowHeights.push(galleryRows[i][j].offsetWidth);
-                }
-                galleryRows[i][j].style.height = rowHeights[i] + "px";
-            }
-        }
-    }
+		for (i = 0; i < galleryRows.length; i++) {
+			for (j = 0; j < galleryRows[i].length; j++) {
+				galleryRows[i][j].classList.add("gallery__image-container--flex" + galleryRows[i].length);
+			}
+		}
+	}
 
-    return {
-        init: init
-    };
+	return {
+		init: init
+	};
 });

@@ -2356,28 +2356,27 @@ Display a selection of images that form a gallery.
 ```
 */
 .gallery {
-  display: flex;
-  flex-flow: row wrap;
-  padding: 4px; }
+  padding: 4px;
+  overflow: hidden; }
   .gallery .gallery__image-container {
     display: inline-block;
     padding: 4px;
-    flex: 1 100%;
-    box-sizing: border-box; }
+    box-sizing: border-box;
+    float: left; }
     .gallery .gallery__image-container--flex2 {
-      flex: 0.5;
-      min-width: 50%; }
+      width: 50%; }
     .gallery .gallery__image-container--flex3 {
-      flex: 0.33;
-      min-width: 33%; }
+      width: 33%; }
     .gallery .gallery__image-container--flex4 {
-      flex: 0.25;
-      min-width: 25%; }
+      width: 25%; }
+    .gallery .gallery__image-container--flex5 {
+      width: 20%; }
     .gallery .gallery__image-container .gallery__link {
       background-color: #4d4d4d; }
       .gallery .gallery__image-container .gallery__link .gallery__image {
         height: 100%;
         width: 100%;
+        padding-bottom: 100%;
         background-color: #999;
         background-size: cover;
         background-position: 50% 50%;

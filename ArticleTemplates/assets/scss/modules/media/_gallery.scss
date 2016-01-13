@@ -23,29 +23,29 @@ Display a selection of images that form a gallery.
 */
 
 .gallery {
-    display: flex;
-    flex-flow: row wrap;
     padding: 4px;
+    overflow: hidden;
 
     .gallery__image-container {
         display: inline-block;
         padding: 4px;
-        flex: 1 100%;
         box-sizing: border-box;
+        float: left;
 
         &--flex2 {
-            flex: 0.5;
-            min-width: 50%;
+            width: 50%;
         }
 
         &--flex3 {
-            flex: 0.33;
-            min-width: 33%;
+            width: 33%;
         }
 
         &--flex4 {
-            flex: 0.25;
-            min-width: 25%;
+            width: 25%;
+        }
+
+        &--flex5 {
+            width: 20%;
         }
 
         .gallery__link {
@@ -54,6 +54,7 @@ Display a selection of images that form a gallery.
             .gallery__image {
                 height: 100%;
                 width: 100%;
+                padding-bottom: 100%;
                 background-color: #999;
                 background-size: cover;
                 background-position: 50% 50%;
@@ -62,19 +63,3 @@ Display a selection of images that form a gallery.
         }
     }
 }
-
-// .gallery {
-//     padding: base-px(1, 1, 0, 1);
-
-//     @include mq($to: col1) {
-//         padding: base-px(.3333);
-//     }
-// }
-
-// .gallery__link {
-//     background-color: lighten(color(shade-1), 10%);
-// }
-
-// .gallery__image {
-//     vertical-align: bottom;
-// }
