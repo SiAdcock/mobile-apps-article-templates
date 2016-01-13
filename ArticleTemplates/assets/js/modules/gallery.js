@@ -6,11 +6,11 @@ define([
 	'use strict';
 
 	var PROPS = {
-			650: {
+			0 :{
 				minImagesPerRow: 2,
 				maxImagesPerRow: 3
 			},
-			900: {
+			650: {
 				minImagesPerRow: 3,
 				maxImagesPerRow: 4
 			},
@@ -24,12 +24,25 @@ define([
 		galleryRows;
 
 	function init() {
+		buildGallery();
+
+		bean.on(window, 'resize', window.ThrottleDebounce.debounce(100, false, handleResize));
+		bean.on(window, 'scroll', window.ThrottleDebounce.debounce(100, false, handleScroll));
+	}
+
+	function buildGallery() {
 		setGalleryProps();
 		addImagesToRows();
 		addFlexClass();
 		showImages();
+	}
 
-		bean.on(window, 'resize scroll', window.ThrottleDebounce.debounce(100, false, showImages));
+	function handleResize() {
+		buildGallery();
+	}
+
+	function handleScroll() {
+		showImages();
 	}
 
 	function setGalleryProps() {
@@ -37,15 +50,12 @@ define([
 
 		for (width in PROPS) {
 			if(PROPS.hasOwnProperty(width)) {
-				if (window.innerWidth < parseInt(width, 10)) {
+				if (window.innerWidth > parseInt(width, 10)) {
 					galleryProps = PROPS[width];
+				} else {
 					break;
 				}
 			}
-		}
-
-		if (!galleryProps) {
-			galleryProps = PROPS[width];
 		}
 	}
 
@@ -99,23 +109,33 @@ define([
 			if (rows[0].length === galleryProps.maxImagesPerRow) {
 				rows.unshift([]);
 			}
-
 			rows[0].unshift(images[i]);
-
-			if (i === 0 && rows[0].length < galleryProps.minImagesPerRow && rows.length > 1) {
-				rows[0].push(rows[1].shift());
-			}
 		}
+
+		for (i = 0; i < rows.length; i++) {
+			while (rows[i].length < galleryProps.minImagesPerRow) {
+				rows[i].push(rows[i + 1].shift());
+			}
+		} 
 
 		galleryRows = rows;
 	}
 
 	function addFlexClass() {
-		var i, j;
+		var i, 
+			j, 
+			smallClass = "gallery__image-container--small-image",
+			largeClass = "gallery__image-container--large-image";
 
 		for (i = 0; i < galleryRows.length; i++) {
 			for (j = 0; j < galleryRows[i].length; j++) {
-				galleryRows[i][j].classList.add("gallery__image-container--flex" + galleryRows[i].length);
+				galleryRows[i][j].classList.remove(smallClass, largeClass);
+
+				if (galleryRows[i].length === galleryProps.maxImagesPerRow) {
+					galleryRows[i][j].classList.add(smallClass);
+				} else {
+					galleryRows[i][j].classList.add(largeClass);
+				}
 			}
 		}
 	}

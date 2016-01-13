@@ -2363,14 +2363,20 @@ Display a selection of images that form a gallery.
     padding: 4px;
     box-sizing: border-box;
     float: left; }
-    .gallery .gallery__image-container--flex2 {
+    .gallery .gallery__image-container--large-image {
       width: 50%; }
-    .gallery .gallery__image-container--flex3 {
-      width: 33%; }
-    .gallery .gallery__image-container--flex4 {
-      width: 25%; }
-    .gallery .gallery__image-container--flex5 {
-      width: 20%; }
+    .gallery .gallery__image-container--small-image {
+      width: 33.33%; }
+    @media all and (min-width: 40.63em) {
+      .gallery .gallery__image-container--large-image {
+        width: 33.33%; }
+      .gallery .gallery__image-container--small-image {
+        width: 25%; } }
+    @media all and (min-width: 75em) {
+      .gallery .gallery__image-container--large-image {
+        width: 25%; }
+      .gallery .gallery__image-container--small-image {
+        width: 20%; } }
     .gallery .gallery__image-container .gallery__link {
       background-color: #4d4d4d; }
       .gallery .gallery__image-container .gallery__link .gallery__image {
@@ -2381,6 +2387,10 @@ Display a selection of images that form a gallery.
         background-size: cover;
         background-position: 50% 50%;
         background-repeat: no-repeat; }
+  @media all and (min-width: 75em) {
+    .gallery {
+      margin: 0 auto;
+      max-width: 1216px; } }
 
 /*doc
 ---

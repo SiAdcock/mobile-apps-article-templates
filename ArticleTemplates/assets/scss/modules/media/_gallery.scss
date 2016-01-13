@@ -22,30 +22,45 @@ Display a selection of images that form a gallery.
 ```
 */
 
+$galleryGutter: 4px;
+
 .gallery {
-    padding: 4px;
+    padding: $galleryGutter;
+    // padding: 4px;
     overflow: hidden;
 
     .gallery__image-container {
         display: inline-block;
-        padding: 4px;
+        padding: $galleryGutter;
         box-sizing: border-box;
         float: left;
 
-        &--flex2 {
+        &--large-image {
             width: 50%;
         }
 
-        &--flex3 {
-            width: 33%;
+        &--small-image {
+            width: 33.33%;
         }
 
-        &--flex4 {
-            width: 25%;
+        @include mq($from: col2) {
+            &--large-image {
+                width: 33.33%;
+            }
+
+            &--small-image {
+                width: 25%;
+            }
         }
 
-        &--flex5 {
-            width: 20%;
+        @include mq($from: col4) {
+            &--large-image {
+                width: 25%;
+            }
+
+            &--small-image {
+                width: 20%;
+            }
         }
 
         .gallery__link {
@@ -61,5 +76,10 @@ Display a selection of images that form a gallery.
                 background-repeat: no-repeat;
             }
         }
+    }
+
+    @include mq($from: col4) {
+        margin: 0 auto;
+        max-width: 1200 + ($galleryGutter * 4);
     }
 }
