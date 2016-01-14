@@ -7,16 +7,13 @@ define([
 
 	var PROPS = {
 			0 :{
-				minImagesPerRow: 2,
-				maxImagesPerRow: 3
+				imagesPerRow: 3
 			},
 			650: {
-				minImagesPerRow: 3,
-				maxImagesPerRow: 4
+				imagesPerRow: 4
 			},
 			1200: {
-				minImagesPerRow: 4,
-				maxImagesPerRow: 5
+				imagesPerRow: 5
 			}
 		};
 
@@ -27,22 +24,17 @@ define([
 		buildGallery();
 
 		bean.on(window, 'resize', window.ThrottleDebounce.debounce(100, false, handleResize));
-		bean.on(window, 'scroll', window.ThrottleDebounce.debounce(100, false, handleScroll));
 	}
 
 	function buildGallery() {
+		console.time("buildGallery");
 		setGalleryProps();
 		addImagesToRows();
 		addFlexClass();
-		showImages();
 	}
 
 	function handleResize() {
 		buildGallery();
-	}
-
-	function handleScroll() {
-		showImages();
 	}
 
 	function setGalleryProps() {
@@ -59,83 +51,77 @@ define([
 		}
 	}
 
-	function showImages() {
-		var i, j;
-
-		for (i = 0; i < galleryRows.length; i++) {
-			for (j = 0; j < galleryRows[i].length; j++) {
-				if (!galleryRows[i][j].classList.contains("loaded") && isImageInView(galleryRows[i][j])) {
-					loadImage(galleryRows[i][j]);
-				}
-			}
-		}
-	}
-
-	function isImageInView(imageContainer) {
-		var rect = imageContainer.getBoundingClientRect();
-
-		return rect.top <= window.innerHeight;
-	}
-
-	function loadImage(imageContainer) {
-		var img = document.createElement("img");
-
-		img.src = imageContainer.dataset.url;
-
-		if (!img.complete) {
-			img.onload = onImageLoaded.bind(null, imageContainer);
-		} else {
-			onImageLoaded(imageContainer);
-		}
-	}
-
-	function onImageLoaded(imageContainer) {
-		var image = imageContainer.getElementsByClassName("gallery__image")[0];
-
-		image.style.backgroundImage = "url('" + imageContainer.dataset.url + "')";
-
-		imageContainer.classList.add("loaded");
-	}
-
 	function addImagesToRows() {
 		var i,
 			images = document.body.getElementsByClassName('gallery__image-container'),
 			rows = [
 				[]
-			],
-			currentRow = 0;
+			];
 
+		// loop through images and add to rows	
 		for (i = images.length - 1; i >= 0; i--) {
-			if (rows[0].length === galleryProps.maxImagesPerRow) {
+			// if current row is full create new row 
+			if (rows[0].length === galleryProps.imagesPerRow) {
 				rows.unshift([]);
 			}
+			// add next image to front of new row
 			rows[0].unshift(images[i]);
 		}
 
-		for (i = 0; i < rows.length; i++) {
-			while (rows[i].length < galleryProps.minImagesPerRow) {
-				rows[i].push(rows[i + 1].shift());
-			}
-		} 
+		// if first row doesn't have enough images call moveImagesToRows
+		if (rows.length > 1 && rows[0].length < (galleryProps.imagesPerRow - 1)) {
+			moveImagesToRows(rows);
+		}
 
 		galleryRows = rows;
 	}
 
-	function addFlexClass() {
-		var i, 
-			j, 
-			smallClass = "gallery__image-container--small-image",
-			largeClass = "gallery__image-container--large-image";
+	function moveImagesToRows(rows) {
+		var i, j, offset;
 
-		for (i = 0; i < galleryRows.length; i++) {
-			for (j = 0; j < galleryRows[i].length; j++) {
-				galleryRows[i][j].classList.remove(smallClass, largeClass);
-
-				if (galleryRows[i].length === galleryProps.maxImagesPerRow) {
-					galleryRows[i][j].classList.add(smallClass);
-				} else {
-					galleryRows[i][j].classList.add(largeClass);
+		for (i = 0; i < rows.length; i++) {
+			if (i === rows.length - 1) {
+				while (rows[i].length < rows[i - 1].length) {
+					rows[i].push(rows[i - 1].pop());
 				}
+			} else {
+				offset = (galleryProps.imagesPerRow - 1) - rows[i].length;
+
+				if (offset > 0) {
+					for (j = 0; j < offset; j++) {
+						if (rows[i + 1]) {
+							rows[i].push(rows[i + 1].shift());
+						}
+					}
+				}
+			}
+		}
+	} 
+
+	function addFlexClass() {
+		var i, j, k;
+
+		// for each row
+		for (i = 0; i < galleryRows.length; i++) {
+			// for each image in row
+			for (j = 0; j < galleryRows[i].length; j++) {
+				// remove flex class
+				removeFlexClass(galleryRows[i][j]);
+				// add new flex class
+				galleryRows[i][j].classList.add("gallery__image-container--flex" + galleryRows[i].length);
+			}
+		}
+
+		console.timeEnd("buildGallery");
+	}
+
+	function removeFlexClass(imageElem) {
+		var i;
+
+		// if imageElem has class name with "flex" in it then remove class
+		for (i = 0; i < imageElem.classList.length; i++) {
+			if (imageElem.classList[i].indexOf("flex") !== -1) {
+				imageElem.classList.remove(imageElem.classList[i]);
 			}
 		}
 	}
