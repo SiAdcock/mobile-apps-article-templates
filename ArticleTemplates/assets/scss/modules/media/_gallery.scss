@@ -26,7 +26,6 @@ $galleryGutter: 4px;
 
 .gallery {
     padding: $galleryGutter;
-    // padding: 4px;
     overflow: hidden;
 
     .gallery__image-container {
@@ -55,45 +54,17 @@ $galleryGutter: 4px;
             width: 20%;
         }
 
-        // &--large-image {
-        //     width: 50%;
-        // }
-
-        // &--small-image {
-        //     width: 33.33%;
-        // }
-
-        // @include mq($from: col2) {
-        //     &--large-image {
-        //         width: 33.33%;
-        //     }
-
-        //     &--small-image {
-        //         width: 25%;
-        //     }
-        // }
-
-        // @include mq($from: col4) {
-        //     &--large-image {
-        //         width: 25%;
-        //     }
-
-        //     &--small-image {
-        //         width: 20%;
-        //     }
-        // }
-
         .gallery__link {
             background-color: lighten(color(shade-1), 10%);
+            position: relative;
+            padding-bottom: 100%;
+            display: -webkit-box;
 
-            .gallery__image {
-                height: 100%;
+            img {
+                position: absolute;
                 width: 100%;
-                padding-bottom: 100%;
-                background-color: #999;
-                background-size: cover;
-                background-position: 50% 50%;
-                background-repeat: no-repeat;
+                height: 100%;
+                object-fit: cover;
             }
         }
     }

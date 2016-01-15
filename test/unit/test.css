@@ -3916,15 +3916,15 @@
       #sandbox .gallery .gallery__image-container--flex5 {
         width: 20%; }
       #sandbox .gallery .gallery__image-container .gallery__link {
-        background-color: #4d4d4d; }
-        #sandbox .gallery .gallery__image-container .gallery__link .gallery__image {
-          height: 100%;
+        background-color: #4d4d4d;
+        position: relative;
+        padding-bottom: 100%;
+        display: -webkit-box; }
+        #sandbox .gallery .gallery__image-container .gallery__link img {
+          position: absolute;
           width: 100%;
-          padding-bottom: 100%;
-          background-color: #999;
-          background-size: cover;
-          background-position: 50% 50%;
-          background-repeat: no-repeat; }
+          height: 100%;
+          object-fit: cover; }
     @media all and (min-width: 75em) {
       #sandbox .gallery {
         margin: 0 auto;
