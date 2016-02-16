@@ -158,23 +158,11 @@ define([
             window.articleImageSizer();
         },
 
-        isThumbNailImageWithoutCaptionPresent: function(el){
-            return el.getElementsByClassName('figure--thumbnail').length;
-        },
-
-        applyArticleContentTypeClasses: function(){
-            var hasThumbnailsWithCaps,
-                classArray;
-        
-            $(".prose").each(function(el){
-                var element = $(el);
-                classArray = [];
-                hasThumbnailsWithCaps = modules.isThumbNailImageWithoutCaptionPresent(el);
-                if (hasThumbnailsWithCaps) {
-                    classArray.push('prose--has-thumbnails-without-caps');
-                } 
-                if (classArray.length) {
-                    element.addClass(classArray.join(" ")); 
+        articleContentType: function() {
+            $('.article__body > .prose').each(function() {
+                // check if this is a "panel" type article by checking for thumbnail images with no captions (as these only exist as panel author thumbnails)
+                if (this.querySelectorAll('.figure--thumbnail:not(.figure--thumbnail-with-caption)').length) {
+                    $(this).addClass('prose--is-panel');
                 }
             });
         },
@@ -426,6 +414,59 @@ define([
                     thumbnailFigures[i].classList.add("landscape-thumbnail");
                 }
             }
+        },
+
+        advertUpdates: function() {
+            var tones, tone, type, 
+                parentNodeClass, bylineElems, 
+                i, elemsToDelete, j;
+
+            tones = {
+                "tone--media": {
+                    "video": "meta__misc",
+                    "gallery": "meta__misc",
+                    "audio": "byline--mobile"
+                },
+                "tone--news": "meta",
+                "tone--feature1": "meta",
+                "tone--feature2": "meta",
+                "tone--feature3": "meta",
+                "tone--podcast": "byline--media"
+            };
+
+            if (document.body.classList.contains("is_advertising")) {
+                for (tone in tones) {
+                    if (tones.hasOwnProperty(tone)) {
+                        if (document.body.classList.contains(tone)) {
+                            if (typeof tones[tone] === 'object') {
+                                for (type in tones[tone]) {
+                                    if (tones[tone].hasOwnProperty(type)) {
+                                        if (document.body.dataset.contentType && document.body.dataset.contentType === type) {
+                                            parentNodeClass = tones[tone][type];
+                                            break;
+                                        }
+                                    }
+                                }
+                            } else {
+                                parentNodeClass = tones[tone];
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (parentNodeClass) {
+                    bylineElems = document.getElementsByClassName("byline");
+                    if (bylineElems.length && !bylineElems[0].children.length) {
+                        elemsToDelete = document.body.getElementsByClassName(parentNodeClass);
+                        for (j = 0; j < elemsToDelete.length; j++) {
+                            if (elemsToDelete[j].parentNode && !elemsToDelete[j].getElementsByClassName("sponsorship").length) {
+                                elemsToDelete[j].parentNode.removeChild(elemsToDelete[j]);
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
 
@@ -444,7 +485,7 @@ define([
             modules.correctCaptions();
             modules.figcaptionToggle();
             modules.imageSizer();
-            modules.applyArticleContentTypeClasses();
+            modules.articleContentType();
             modules.insertTags();
             modules.videoPositioning();
             modules.loadComments();
@@ -461,6 +502,7 @@ define([
             modules.setGlobalObject(window);
             modules.fixSeries();
             modules.formatThumbnailImages();
+            modules.advertUpdates();
             window.getArticleHeight = modules.getArticleHeight;
             window.applyNativeFunctionCall('getArticleHeight');
             Sharing.init(window);

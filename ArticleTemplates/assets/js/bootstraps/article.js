@@ -5,14 +5,18 @@ define([
     'modules/$',
     'modules/twitter',
     'modules/witness',
-    'modules/outbrain'
+    'modules/outbrain',
+    'modules/quiz',
+    'smoothScroll'
 ], function (
     bean,
     bonzo,
     $,
     twitter,
     witness,
-    outbrain
+    outbrain,
+    Quiz,
+    smoothScroll
 ) {
     'use strict';
 
@@ -35,7 +39,11 @@ define([
             };
             window.applyNativeFunctionCall('articleOutbrainInserter');
         },
-        
+
+        loadQuizzes: function () {
+            Quiz.init();
+        },
+
         formatImmersive : function(){
             if (!$('.immersive').length) {
                 return false;
@@ -53,15 +61,17 @@ define([
             $('.article__header-bg, .article__header-bg .element > iframe').css('height', bgHeight);
             
             // TODO: This is just not a fix, we actually need for the embed to be sent through with prefixed & unprefixed styles
-            var iframe = $('.article__header-bg .element > iframe');
-            if (iframe.length) {
-                var newSrc = iframe[0].srcdoc
-                    .replace("transform: translate(-50%, -50%);", "-webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);")
-                    .replace(/-webkit-animation/g, "animation")
-                    .replace(/animation/g, "-webkit-animation")
-                    .replace(/-webkit-keyframes/g, "keyframes")
-                    .replace(/@keyframes/g, "@-webkit-keyframes");
-                iframe[0].srcdoc = newSrc;
+            if ($('body').hasClass('windows')) {
+                var iframe = $('.article__header-bg .element > iframe');
+                if (iframe.length) {
+                    var newSrc = iframe[0].srcdoc
+                        .replace("transform: translate(-50%, -50%);", "-webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);")
+                        .replace(/-webkit-animation/g, "animation")
+                        .replace(/animation/g, "-webkit-animation")
+                        .replace(/-webkit-keyframes/g, "keyframes")
+                        .replace(/@keyframes/g, "@-webkit-keyframes");
+                    iframe[0].srcdoc = newSrc;
+                }
             }
 
             // find all the section seperators & add classes
@@ -119,6 +129,7 @@ define([
                 // modules.updateProgressBar(progressBar, articleHeight);
             }));
 
+
             // add a resize / orientation event to redraw the chapter positions for new article height
             bean.on(window, 'resize.cards orientationchange.cards', window.ThrottleDebounce.debounce(100, false, function () {
                 // remeasure article height 
@@ -165,6 +176,7 @@ define([
             twitter.enhanceTweets();
             witness.duplicate();
             modules.insertOutbrain();
+            modules.loadQuizzes();
             modules.formatImmersive();
             modules.richLinkTracking();
         }
